@@ -8,14 +8,31 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = { 
-      repos: []
+      repos: [{name:'jack', url: 'www'}, {name:'jack', url: 'www'}, {name:'jack', url: 'www'}]
     }
 
   }
 
+
   search (term) {
     console.log(`${term} was searched`);
     // TODO
+    //Send a Post request to '/repos' 
+    
+    $.ajax({
+      type: "POST",
+      url: '/repos',
+      data: JSON.stringify({username: term}),
+      contentType: 'application/json',
+      success: (data) => {
+        
+        //console.log('SUCCESS AJAX SENT ', data);
+        
+        //Take the data === the new repos
+        this.setState({repos: [{name:'jon', url: 'www'}, {name:'jason', url: 'www'}, {name:'jimmy', url: 'www'}]});
+      } 
+    });
+    
   }
 
   render () {
@@ -28,3 +45,5 @@ class App extends React.Component {
 }
 
 ReactDOM.render(<App />, document.getElementById('app'));
+
+//'<!DOCTYPE html><html><head><title>Github Repo Fetcher</title></head><body><h1>HELLOOOOOOO</h1></body></html>'
