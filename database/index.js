@@ -1,20 +1,23 @@
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/fetcher');  //Opens a connection to the MongoDB on locally running MongoDB
+var Promise = require('bluebird');
 
 
 let repoSchema = mongoose.Schema({
   // TODO: your schema here!
-  name: String,
-  date: { type: Date, default: Date.now }
+  //An ID is created by the db and a __v
+  username: String,
+  url: String,
+  watchers: Number
 });
 
 let Repo = mongoose.model('Repo', repoSchema);
+
 
 let save = (inputData, callback) => {
   // TODO: Your code here
   // This function should save a repo or repos to
   // the MongoDB
-  
   var model = new Repo(inputData);
   
   model.save((err, data) => {
