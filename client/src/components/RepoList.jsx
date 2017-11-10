@@ -7,7 +7,13 @@ const RepoList = (props) => (
     
     <div>
       {props.repos.map((repo, index) => (
-        <div key={index}>{repo.name}</div>
+        <div key={index}>
+          ({index + 1}) 
+          <p>{repo.username}</p>
+          <a href={repo.url}>
+            {repo.url} 
+          </a>
+        </div>
       ))}
     </div>
     

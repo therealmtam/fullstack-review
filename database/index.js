@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/fetcher');  //Opens a connection to the MongoDB on locally running MongoDB
-var Promise = require('bluebird');
-
+const Promise = require('bluebird');
 
 let repoSchema = mongoose.Schema({
   // TODO: your schema here!
@@ -15,54 +14,78 @@ let Repo = mongoose.model('Repo', repoSchema);
 
 
 let save = (inputData, callback) => {
-  // TODO: Your code here
-  // This function should save a repo or repos to
-  // the MongoDB
-  var model = new Repo(inputData);
-  
-  model.save((err, data) => {
-    
-    if (err) {
-      return console.error(err);
-    }
 
-    console.log('DATABASE - saved to MongoDB');
+console.log(inputData);
+
+  var files = [];
+  inputData.forEach(function(repo) {
+    
+    files.push(
+      
+      Repo.findOne({'username': repo.username, 'url': repo.url}).exec()
+      .then(result => {
+        if (result === null) {
+          console.log('SAVE');
+          return Repo.create(repo, (err, data) => {
+            if (err) {
+              return console.error(err);
+            }
+            console.log('SAVE1');
+          });
+
+        } else {
+          return Repo.create(repo, (err, data) => {
+            if (err) {
+              return console.error(err);
+            }
+            console.log('SAVE2');
+          });
+        }
+      })
+
+      //Repo.findOneAndUpdate({'username': repo.username, 'url': repo.url}, repo, {'upsert': true}, function(err, data){});
+    );
+
+  });
+
+  
+
+  Promise.all(files)
+  .then(function() {
+    console.log('DONE');
     callback();
   });
   
+//----------------------
+  // Repo.create(inputData, (err, data) => {
+      
+  //   if (err) {
+  //     return console.error(err);
+  //   }
+    
+  //   callback();
+  // });
+  
 };
 
-// //TEST
+let top25 = (callback) => {
 
-// //CHECKS THE CONNECTION:
-// var db = mongoose.connection;
-// db.on('error', console.error.bind(console, 'connection error:'));
-// db.once('open', function() {
-//   // we're connected!
-//   console.log('WE ARE CONNECTED TO THE DB');
-// });
+  Repo.find({}).sort({'watchers': -1}).limit(25).exec((err, data) => {
+    callback(data);
+  });
 
-// //Creates a new model
-// var newRepo = new Repo({ name: 'test'});
-// //Save the model to the db:
-// save(newRepo);
+}
 
-// Repo.find((err, repos) => {
-//     console.log(repos);
-// });
+let userRepo = (username, callback) => {
 
-// Repo.remove({ _id: '5a038beabc5022299338ec8e'}, (err, repos) => {
-//   if (err) {
-//     console.log('DATABASE - Error removing model');
-//   }
-//   console.log('DATABASE - successfully removed model');
-// });
+  Repo.find({}).where('username', username).sort({'watchers': -1}).exec((err, data) => {
+    callback(data);
+  });
+
+}
 
 module.exports.save = save;
-
-
-
-//MONGOOSE NOTES:
-//Do not declare methods using ES6 arrow functions (=>). Arrow functions explicitly prevent binding this, so your method will not have access to the document and the above examples will not work.
+module.exports.top25 = top25;
+module.exports.userRepo = userRepo;
 
 

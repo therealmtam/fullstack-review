@@ -2,7 +2,7 @@
 const express = require('express');
 let app = express();
 //-----------------
-const github = require('../helpers/github'); //Helpers - Exports getReposByUsername()
+const github = require('../helpers/github');
 const bodyParser = require('body-parser');
 
 //EXPRESS MIDDLEWARE:
@@ -13,24 +13,34 @@ app.use(bodyParser.json())
 
 //EXPRESS ROUTES:
 app.post('/repos', function (req, res) {
-  // TODO - your code here!
-  // This route should take the github username provided
-  // and get the repo information from the github API, then
-  // save the repo information in the database
 
-  //Parse out request for the form data
-  //Pass the user name to the github function
-  //res.redirect('/repos');
-  github.getReposByUsername(req.body.username, function() {
-    res.redirect('/repos');
+  // github.saveReposByUsername(req.body.username, function() {
+  //   res.redirect('/repos');
+  // });
+
+  github.saveReposByUsername(req.body.username, function() {
+    github.getReposByUserName(req.body.username, (data) => {
+      res.status(201).send(data);
+    });
   });
   
 });
 
-app.get('/repos', function (req, res) {
-  // TODO - your code here!
-  // This route should send back the top 25 repos
-  res.send('<!DOCTYPE html><html><head><title>Github Repo Fetcher</title></head><body><h1>HELLOOOOOOO</h1></body></html>');
+// app.get('/repos', function (req, res) {
+
+//   var username = 'therealmtam';
+//   github.getReposByUserName(username, (data) => {
+//     res.status(200).send(data);
+//   });
+
+// });
+
+app.get('/top25', function (req, res) {
+
+  github.getTop25((data) => {
+    res.status(200).send(data);
+  });
+
 });
 
 

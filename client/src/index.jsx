@@ -8,16 +8,25 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = { 
-      repos: [{name:'jack', url: 'www'}, {name:'jack', url: 'www'}, {name:'jack', url: 'www'}]
+      repos: [{username:'jack', url: 'www'}, {username:'jack', url: 'www'}, {username:'jack', url: 'www'}]
     }
 
   }
 
+  componentDidMount () {
+    $.ajax({
+      type: "GET",
+      url: '/top25',
+      contentType: 'application/json',
+      success: (data) => {
+        this.setState({repos: data});
+      } 
+    });
+  }  
 
   search (term) {
     console.log(`${term} was searched`);
     // TODO
-    //Send a Post request to '/repos' 
     
     $.ajax({
       type: "POST",
@@ -25,11 +34,7 @@ class App extends React.Component {
       data: JSON.stringify({username: term}),
       contentType: 'application/json',
       success: (data) => {
-        
-        //console.log('SUCCESS AJAX SENT ', data);
-        
-        //Take the data === the new repos
-        this.setState({repos: [{name:'jon', url: 'www'}, {name:'jason', url: 'www'}, {name:'jimmy', url: 'www'}]});
+        this.setState({repos: data});
       } 
     });
     
@@ -46,4 +51,3 @@ class App extends React.Component {
 
 ReactDOM.render(<App />, document.getElementById('app'));
 
-//'<!DOCTYPE html><html><head><title>Github Repo Fetcher</title></head><body><h1>HELLOOOOOOO</h1></body></html>'

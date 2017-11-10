@@ -4,7 +4,7 @@ const config = require('../config.js');
 const db = require('../database');  //Database - Exports Saving of Model to MongoDB
 
 
-let getReposByUsername = (username, callback) => {
+let saveReposByUsername = (username, callback) => {
     
   let options = {
     url: `https://api.github.com/users/${username}/repos`,
@@ -27,7 +27,10 @@ let getReposByUsername = (username, callback) => {
 
     if (gitData.message === 'Not Found') {
 
+      callback();
+
     } else {
+
       gitData.forEach((repo, index) => {
         toBeStored.push({
           username: username,
@@ -35,15 +38,33 @@ let getReposByUsername = (username, callback) => {
           watchers: repo.watchers_count
         });
       });
+
+      db.save(toBeStored, callback);
     }
-
-    console.log(toBeStored);
-
-    callback();
-    //db.save(toBeStored, callback);
 
   });
   
 }
 
-module.exports.getReposByUsername = getReposByUsername;
+
+let getTop25 = (callback) => {
+    
+  db.top25(callback);
+}
+
+let getReposByUserName = (username, callback) => {
+    
+  db.userRepo(username, callback);
+}
+
+
+module.exports.saveReposByUsername = saveReposByUsername;
+module.exports.getTop25 = getTop25;
+module.exports.getReposByUserName = getReposByUserName;
+
+
+
+
+
+
+
